@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --coral: #E05C3A;
+  --coral-light: #F07D5E;
+  --coral-dark: #C04A2A;
+  --cream: #FFF8F2;
+  --warm-white: #FDEEE6;
+  --sand: #F2DDD0;
+  --charcoal: #2C2018;
+  --muted: #8C6A58;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--charcoal);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain noise texture on hero */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+/* Masonry gallery */
+.masonry-grid {
+  columns: 2;
+  column-gap: 10px;
+}
+@media (min-width: 640px) {
+  .masonry-grid { columns: 3; }
+}
+@media (min-width: 1024px) {
+  .masonry-grid { columns: 4; }
+}
+.masonry-grid > div {
+  break-inside: avoid;
+  margin-bottom: 10px;
+}

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/user/Downloads/**)",
+      "Bash(gh repo:*)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npm install:*)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --yes --name odd-looker-studio)",
+      "Bash(npx create-next-app@latest odd-looker-tmp --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --yes)",
+      "Bash(cp -r /c/Users/user/Downloads/odd-looker-tmp/. \"/c/Users/user/Downloads/Odd Looker Studio/\")",
+      "Bash(rm -rf /c/Users/user/Downloads/odd-looker-tmp)",
+      "Bash(npm run:*)",
+      "Bash(npx vercel:*)"
+    ]
+  }
+}
