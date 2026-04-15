@@ -37,7 +37,7 @@ export default function Home() {
             className="text-sm font-bold tracking-wide text-[#2C2018]"
             style={{ fontFamily: "var(--font-space-mono), monospace" }}
           >
-            ODD LOOKER
+            ODD CRAFTER
           </span>
         </div>
         <a
@@ -101,7 +101,7 @@ export default function Home() {
             fontSize: "clamp(2.8rem, 8vw, 6rem)",
           }}
         >
-          Odd Looker<br />Studio
+          Odd Crafter<br />Studio
         </motion.h1>
 
         {/* Tagline */}
@@ -252,7 +252,7 @@ export default function Home() {
                 className="font-bold tracking-wider text-sm"
                 style={{ fontFamily: "var(--font-space-mono), monospace" }}
               >
-                ODD LOOKER STUDIO
+                ODD CRAFTER STUDIO
               </p>
               <p className="text-[#8C6A58] text-xs mt-0.5 flex items-center gap-1">
                 <MapPin size={10} />
@@ -301,7 +301,7 @@ export default function Home() {
             className="text-[#8C6A58] text-xs"
             style={{ fontFamily: "var(--font-space-mono), monospace" }}
           >
-            © 2025 Odd Looker Studio · George Town, Penang
+            © 2025 Odd Crafter Studio · George Town, Penang
           </p>
         </div>
       </footer>

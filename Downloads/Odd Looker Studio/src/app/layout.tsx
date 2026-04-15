@@ -21,11 +21,11 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Odd Looker Studio — Art Workshops in George Town, Penang",
+  title: "Odd Crafter Studio — Art Workshops in George Town, Penang",
   description:
     "Hands-on art workshops in George Town, Penang. Totebag painting, batik, candle-making and more. Book by appointment.",
   openGraph: {
-    title: "Odd Looker Studio",
+    title: "Odd Crafter Studio",
     description: "Make something beautiful today.",
     locale: "en_MY",
     type: "website",
