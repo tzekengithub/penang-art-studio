@@ -25,7 +25,6 @@ npm run db:generate  # Generate Drizzle migration files
 cd van-scheduler
 npx ts-node --project tsconfig.scripts.json scripts/test-parser.ts
 npx ts-node --project tsconfig.scripts.json scripts/test-scheduler.ts   # full E2E with DB
-npx ts-node --project tsconfig.scripts.json scripts/test-alphard-quick.ts
 ```
 
 **PDF microservice** (runs separately, needed for PDF upload):
@@ -38,14 +37,20 @@ python main.py       # Listens on PORT (default 8080)
 
 ## Environment
 
-Create `van-scheduler/.env.local`:
+Copy `van-scheduler/.env.example` to `van-scheduler/.env.local` and fill in values:
 ```
 DATABASE_URL=postgresql://user:password@host/dbname
 OPENROUTER_API_KEY=sk-or-v1-...
 NEXT_PUBLIC_PDF_SERVICE_URL=https://your-railway-app.up.railway.app
+NEXT_PUBLIC_APP_URL=                  # defaults to http://localhost:3000
+COMPANY_NAME=                         # shown in page title and AI system prompt
+COMPANY_PHONE=                        # lines containing this are stripped from parsed PDFs
+COMPANY_EMAIL=
+COMPANY_ADDRESS=
+LOCATIONS=KL,Penang,JB,...            # comma-separated; populates location dropdowns
 ```
 
-`NEXT_PUBLIC_PDF_SERVICE_URL` is exposed to the browser (health check / cold-start countdown). The PDF service is deployed on Railway. `NEXT_PUBLIC_APP_URL` defaults to `http://localhost:3000` if unset.
+`NEXT_PUBLIC_PDF_SERVICE_URL` is exposed to the browser (health check / cold-start countdown). The PDF service is deployed on Railway.
 
 ## Architecture
 
@@ -54,7 +59,7 @@ NEXT_PUBLIC_PDF_SERVICE_URL=https://your-railway-app.up.railway.app
 There are two distinct flows for getting bookings into the system:
 
 1. **`/api/upload`** — Parses PDFs directly on the server, inserts, then runs the **rules engine** (`recheckAllVans`). Used for direct uploads without preview.
-2. **`/api/preview` → `/api/insert`** — Client calls `/api/preview` first to show a confirmation UI, then `/api/insert` with the pre-parsed JSON. `/api/insert` runs the **AI scheduler** (`aiRecheckAllVans`) and passes the newly inserted IDs as `newIds` so the AI knows which bookings are fresh vs already assigned.
+2. **`/api/preview` → `/api/insert`** — Client calls `/api/preview` first to show a confirmation UI, then `/api/insert` with the pre-parsed JSON. `/api/insert` also runs the **rules engine** (`recheckAllVans`).
 
 Both routes stream SSE events (`parsed`, `progress`, `recheck`, `recheck_log`, `ai_summary`, `done`, `error`).
 
@@ -98,11 +103,11 @@ Three tables:
 | `/api/upload` | POST | Parse PDFs → insert → rules engine recheck (SSE) |
 | `/api/insert` | POST | Accept pre-parsed JSON → insert → AI recheck (SSE) |
 | `/api/preview` | POST | Parse PDFs without inserting (preview UI) |
-| `/api/reassign` | POST | Manual "AI Recheck" button — runs full `aiRecheckAllVans` (SSE) |
+| `/api/reassign` | POST | Manual "Recheck" button — runs full `recheckAllVans` rules engine (SSE) |
 | `/api/chat` | POST | Agentic AI chat with 4 tools: `assign_van`, `set_outsource`, `save_scheduling_rule`, `trigger_recheck` (SSE) |
 | `/api/scheduling-rules` | GET, POST, DELETE | CRUD for persistent scheduling rules |
 | `/api/clear` | POST | Truncate all bookings |
-| `/api/seed` | POST | Insert 6 default vans if not present |
+| `/api/seed` | POST | Insert 3 placeholder vans (VAN-001..003) if not present |
 
 ### Library (`lib/`)
 
@@ -111,7 +116,8 @@ Three tables:
 - **`van-assignment.ts`** — `smartAssignVan()` uses OpenRouter for single-booking decisions with hard constraints and soft preferences.
 - **`recheck.ts`** — 7-step full schedule orchestrator (rules engine).
 - **`reassign.ts`** — Priority-based two-pass bump algorithm called by recheck.
-- **`ai-scheduler.ts`** — Batched AI scheduler for full or targeted recheck.
+- **`config.ts`** — Single source of truth for company identity and location list, read from env vars (`COMPANY_NAME`, `COMPANY_PHONE`, `LOCATIONS`). Consumed by `pdf-parser.ts` (line-skip filter), `ai-scheduler.ts` (system prompt), `layout.tsx` (page title), and `page.tsx` (location dropdown). Change company branding here, not in individual files.
+- **`ai-scheduler.ts`** — Batched AI scheduler for full or targeted recheck. CHUNK_SIZE is 50 (updated from 25).
 - **`chat-context.ts`** — `buildScheduleContext()` formats fleet + booking data for the chat LLM (capped at 60 days / 150 bookings).
 - **`scheduling-rules.ts`** — CRUD helpers for the `schedulingRules` table.
 
@@ -134,5 +140,5 @@ Global upload state (modal open/close, preview rows, SSE progress, AI reasoning)
 - **PyMuPDF in Python** — no JS equivalent; Next.js calls it via HTTP.
 - **`manualChange` flag** prevents auto-reassignment from overwriting user edits during re-uploads or rechecks.
 - **`isNew` flag in AI payload** — when inserting new bookings, existing assignments are flagged `isNew=false` so the AI only displaces them if a new higher-priority trip forces it, preventing unnecessary reshuffling.
-- **Chunked AI batching** — 25 bookings per OpenRouter request to avoid timeouts; committed van+date slots are passed as context between chunks so the AI never double-books across batches.
+- **Chunked AI batching** — 50 bookings per OpenRouter request (CHUNK_SIZE); committed van+date slots are passed as context between chunks so the AI never double-books across batches.
 - **Invoice continuity exceptions** — one-way trips with a multi-day gap between legs don't require the same van; outsourced legs don't carry continuity to subsequent legs.
