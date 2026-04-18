@@ -1,0 +1,276 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap');
+
+:root {
+  --bg: #0a0a0a;
+  --cyan: #00f5ff;
+  --coral: #ff4d6d;
+  --white: #ffffff;
+  --surface: #111111;
+  --surface-2: #1a1a1a;
+  --border: #222222;
+  --font-grotesk: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  cursor: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-grotesk);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(0, 245, 255, 0.3);
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cyan);
+  border-radius: 2px;
+}
+
+/* ─── GLITCH TEXT ─── */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.glitch::before {
+  color: var(--cyan);
+  animation: glitch-top 4s infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+}
+
+.glitch::after {
+  color: var(--coral);
+  animation: glitch-bottom 4s infinite 0.15s;
+  clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+}
+
+@keyframes glitch-top {
+  0%, 90%, 100% {
+    transform: translate(0);
+    opacity: 0;
+  }
+  91% {
+    transform: translate(-3px, -2px);
+    opacity: 0.8;
+  }
+  92% {
+    transform: translate(3px, 2px);
+    opacity: 0.8;
+  }
+  93% {
+    transform: translate(-3px, -2px);
+    opacity: 0.8;
+  }
+  94%, 95% {
+    transform: translate(3px, 2px);
+    opacity: 0;
+  }
+  96% {
+    transform: translate(-5px, 0);
+    opacity: 0.8;
+  }
+  97% {
+    transform: translate(5px, 0);
+    opacity: 0;
+  }
+  98% {
+    transform: translate(-2px, 3px);
+    opacity: 0.8;
+  }
+  99% {
+    transform: translate(2px, -3px);
+    opacity: 0;
+  }
+}
+
+@keyframes glitch-bottom {
+  0%, 90%, 100% {
+    transform: translate(0);
+    opacity: 0;
+  }
+  91% {
+    transform: translate(3px, 2px);
+    opacity: 0.8;
+  }
+  92% {
+    transform: translate(-3px, -2px);
+    opacity: 0.8;
+  }
+  93% {
+    transform: translate(3px, 2px);
+    opacity: 0;
+  }
+  94% {
+    transform: translate(-3px, -2px);
+    opacity: 0.8;
+  }
+  95%, 96% {
+    transform: translate(5px, 0);
+    opacity: 0;
+  }
+  97% {
+    transform: translate(-5px, 0);
+    opacity: 0.8;
+  }
+  98% {
+    transform: translate(2px, -3px);
+    opacity: 0;
+  }
+  99% {
+    transform: translate(-2px, 3px);
+    opacity: 0.8;
+  }
+}
+
+/* ─── GRADIENT BORDER CARDS ─── */
+.gradient-border {
+  position: relative;
+  background: var(--surface);
+  border-radius: 12px;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, rgba(0,245,255,0.3), rgba(255,77,109,0.1), rgba(0,245,255,0.05));
+  z-index: -1;
+  transition: opacity 0.3s;
+  opacity: 0.5;
+}
+
+.gradient-border:hover::before {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(0,245,255,0.6), rgba(255,77,109,0.4), rgba(0,245,255,0.2));
+}
+
+/* ─── SCAN LINE EFFECT ─── */
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0,245,255,0.4), transparent);
+  animation: scan-line 4s linear infinite;
+  pointer-events: none;
+}
+
+/* ─── NOISE OVERLAY ─── */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ─── CURSOR HIDDEN ─── */
+a, button, [role="button"] {
+  cursor: none;
+}
+
+/* ─── GLOW UTILITIES ─── */
+.glow-cyan {
+  text-shadow: 0 0 20px rgba(0,245,255,0.5), 0 0 40px rgba(0,245,255,0.3);
+}
+
+.glow-coral {
+  text-shadow: 0 0 20px rgba(255,77,109,0.5);
+}
+
+.box-glow-cyan {
+  box-shadow: 0 0 20px rgba(0,245,255,0.2), 0 0 60px rgba(0,245,255,0.08);
+}
+
+.box-glow-coral {
+  box-shadow: 0 0 20px rgba(255,77,109,0.2), 0 0 60px rgba(255,77,109,0.08);
+}
+
+/* ─── GRID BG ─── */
+.grid-bg {
+  background-image: linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── MARQUEE ─── */
+.marquee-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.marquee-wrapper::before,
+.marquee-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  z-index: 2;
+}
+
+.marquee-wrapper::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--bg), transparent);
+}
+
+.marquee-wrapper::after {
+  right: 0;
+  background: linear-gradient(-90deg, var(--bg), transparent);
+}
+
+/* ─── SECTION TRANSITIONS ─── */
+.section-fade {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.section-fade.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
